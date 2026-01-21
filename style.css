@@ -1,130 +1,62 @@
-/* ===== RESET & BASE ===== */
-* {
-  box-sizing: border-box;
-}
-
-body {
-  font-family: Tahoma, sans-serif;
-  background: linear-gradient(135deg, #84fab0, #8fd3f4);
-  text-align: center;
-  margin: 0;
-  min-height: 100vh;
-  padding: 10px;
-}
-
-/* ===== TITLE ===== */
-h1 {
-  color: #ffffff;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-  margin-bottom: 20px;
-}
-
-/* ===== CARD ===== */
-#card {
-  background: #ffffff;
-  width: 100%;
-  max-width: 420px;
-  margin: auto;
-  padding: 20px;
-  border-radius: 20px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-}
-
-/* ===== QUESTION TEXT ===== */
-#question {
-  font-size: 18px;
-  margin-bottom: 10px;
-  color: #555555;
-}
-
-/* ===== NOTE SYMBOL ===== */
-#note {
-  font-size: clamp(48px, 20vw, 100px);
-  margin: 20px 0;
-  color: #333333;
-}
-
-/* ===== BUTTON GROUP ===== */
-.buttons {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
 /* ===== BUTTON BASE ===== */
 button {
-  padding: 12px;
+  padding: 14px;
   font-size: 16px;
-  border-radius: 12px;
+  border-radius: 14px;
   border: none;
   cursor: pointer;
-  transition: 0.2s ease;
+  transition: transform 0.15s ease, filter 0.15s ease;
+  -webkit-tap-highlight-color: transparent; /* เอากรอบฟ้าออกบนมือถือ */
 }
 
-/* ===== NOTE BUTTON COLORS ===== */
-button.whole {
+/* ===== COLOR BUTTONS ===== */
+.whole {
   background: #ff7675;
   color: white;
 }
 
-button.half {
+.half {
   background: #74b9ff;
   color: white;
 }
 
-button.quarter {
+.quarter {
   background: #55efc4;
   color: #2d3436;
 }
 
-button.eighth {
+.eighth {
   background: #fdcb6e;
   color: #2d3436;
 }
 
-/* ===== HOVER EFFECT ===== */
-button:hover:not(:disabled) {
-  transform: scale(1.05);
-}
-
-/* ===== DISABLED (AFTER ANSWER) ===== */
+/* ===== DISABLED FIX (ไม่ให้เทา) ===== */
 button:disabled {
-  opacity: 0.5;
+  opacity: 1;              /* ❌ ไม่จาง */
+  filter: none;            /* ❌ ไม่เป็นเทา */
   cursor: not-allowed;
-  transform: none;
 }
 
-/* ===== RESULT TEXT ===== */
-#result {
-  font-size: 18px;
-  margin: 10px 0;
-  font-weight: bold;
+/* ===== MOBILE TOUCH FEEDBACK ===== */
+button:active {
+  transform: scale(0.96);
+  filter: brightness(0.9);
 }
 
-/* ===== SCORE ===== */
-#score {
-  font-size: 16px;
-  margin-bottom: 10px;
-}
-
-/* ===== RESTART BUTTON ===== */
-#restartBtn {
-  background: #6c5ce7;
+/* ===== ANSWER FEEDBACK COLOR ===== */
+button.correct-btn {
+  background: #2ecc71 !important;
   color: white;
-  padding: 10px 16px;
-  border-radius: 12px;
-  font-size: 15px;
 }
 
-/* ===== MOBILE SMALL SCREEN FIX ===== */
-@media (max-width: 400px) {
-  #card {
-    padding: 15px;
-  }
+button.wrong-btn {
+  background: #e74c3c !important;
+  color: white;
+}
 
-  button {
-    font-size: 14px;
-    padding: 10px;
-  }
+/* ===== BUTTON GRID (กันล้นมือถือ) ===== */
+.buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
