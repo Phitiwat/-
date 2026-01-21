@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>เกมทายโน้ตดนตรี</title>
 
-  <!-- link CSS -->
+  <!-- ✅ เชื่อม CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,14 +13,13 @@
 
 <div id="card">
   <div id="question">ข้อที่ 1 / 15</div>
-
   <div id="note">♪</div>
 
   <div class="buttons">
-    <button class="whole" onclick="checkAnswer('ตัวกลม')">ตัวกลม</button>
-    <button class="half" onclick="checkAnswer('ตัวขาว')">ตัวขาว</button>
-    <button class="quarter" onclick="checkAnswer('ตัวดำ')">ตัวดำ</button>
-    <button class="eighth" onclick="checkAnswer('ตัวเขบ็ด')">ตัวเขบ็ด</button>
+    <button onclick="checkAnswer('ตัวกลม')">ตัวกลม</button>
+    <button onclick="checkAnswer('ตัวขาว')">ตัวขาว</button>
+    <button onclick="checkAnswer('ตัวดำ')">ตัวดำ</button>
+    <button onclick="checkAnswer('ตัวเขบ็ด')">ตัวเขบ็ด</button>
   </div>
 
   <div id="result"></div>
@@ -29,8 +28,7 @@
   <button id="restartBtn" onclick="restartGame()">🔁 เล่นใหม่</button>
 </div>
 
-<!-- link JavaScript (ต้องอยู่ล่างสุด) -->
+<!-- ✅ เชื่อม JS -->
 <script src="script.js"></script>
-
 </body>
 </html>
