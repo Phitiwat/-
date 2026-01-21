@@ -1,35 +1,152 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>เกมทายโน้ตดนตรี</title>
-  <link rel="stylesheet" href="style.css">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      background: #f7f7f7;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 420px;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+    }
+
+    .note {
+      text-align: center;
+      font-size: 5rem; /* ⭐ ตัวโน้ตใหญ่ */
+      margin: 20px 0;
+    }
+
+    .choices {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    button.choice {
+      padding: 16px;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 14px;
+      background: #eaeaea;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button.choice:active {
+      transform: scale(0.96);
+    }
+
+    .correct {
+      background: #4caf50 !important;
+      color: white;
+    }
+
+    .wrong {
+      background: #f44336 !important;
+      color: white;
+    }
+
+    .info {
+      margin-top: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .reset {
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: none;
+      background: orange;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+  </style>
 </head>
 
 <body>
+  <div class="app">
+    <h1>🎵 เกมทายโน้ตดนตรี</h1>
 
-<h1>🎵 เกมทายโน้ตดนตรี</h1>
+    <div class="note" id="noteSymbol">♯</div>
 
-<div id="card">
-  <div id="question">ข้อที่ 1 / 15</div>
-  <div id="note">♪</div>
+    <div class="choices">
+      <button class="choice" onclick="checkAnswer('whole', this)">ตัวกลม</button>
+      <button class="choice" onclick="checkAnswer('half', this)">ตัวขาว</button>
+      <button class="choice" onclick="checkAnswer('black', this)">ตัวดำ</button>
+      <button class="choice" onclick="checkAnswer('sharp', this)">ตัวเขบ็ด</button>
+    </div>
 
-  <div class="buttons">
-    <button onclick="checkAnswer('ตัวกลม')">ตัวกลม</button>
-    <button onclick="checkAnswer('ตัวขาว')">ตัวขาว</button>
-    <button onclick="checkAnswer('ตัวดำ')">ตัวดำ</button>
-    <button onclick="checkAnswer('ตัวเขบ็ด')">ตัวเขบ็ด</button>
+    <div class="info">
+      <div>คะแนน: <span id="score">0</span></div>
+      <button class="reset" onclick="resetGame()">เล่นใหม่</button>
+    </div>
   </div>
 
-  <div id="result"></div>
-  <div id="score">คะแนน: 0</div>
+  <script>
+    let score = 0;
 
-  <button id="restartBtn" onclick="restartGame()">🔁 เล่นใหม่</button>
-</div>
+    const questions = [
+      { symbol: "♯", answer: "sharp" },
+      { symbol: "●", answer: "whole" },
+      { symbol: "𝅗𝅥", answer: "half" },
+      { symbol: "♩", answer: "black" }
+    ];
 
-<!-- ✅ เชื่อม JS -->
-<script src="script.js"></script>
+    let current;
+
+    function newQuestion() {
+      current = questions[Math.floor(Math.random() * questions.length)];
+      document.getElementById("noteSymbol").textContent = current.symbol;
+
+      document.querySelectorAll(".choice").forEach(btn => {
+        btn.classList.remove("correct", "wrong");
+        btn.disabled = false;
+      });
+    }
+
+    function checkAnswer(value, button) {
+      document.querySelectorAll(".choice").forEach(b => b.disabled = true);
+
+      if (value === current.answer) {
+        button.classList.add("correct");
+        score++;
+        document.getElementById("score").textContent = score;
+      } else {
+        button.classList.add("wrong");
+      }
+
+      setTimeout(newQuestion, 800);
+    }
+
+    function resetGame() {
+      score = 0;
+      document.getElementById("score").textContent = 0;
+      newQuestion();
+    }
+
+    newQuestion();
+  </script>
 </body>
 </html>
-
