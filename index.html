@@ -1,153 +1,184 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>เกมทายโน้ตดนตรี</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>เกมทายโน้ตดนตรี</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      font-family: system-ui, sans-serif;
-    }
+<style>
+*{
+  box-sizing:border-box;
+  font-family:system-ui,sans-serif;
+}
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      background: #f7f7f7;
-    }
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  background:#f6f6f6;
+}
 
-    .app {
-      width: 100%;
-      max-width: 420px;
-      padding: 20px;
-    }
+.app{
+  width:100%;
+  max-width:420px;
+  padding:20px;
+}
 
-    h1 {
-      text-align: center;
-      font-size: 2rem;
-    }
+h1{
+  text-align:center;
+  font-size:2rem;
+}
 
-    .note {
-      text-align: center;
-      font-size: 5rem; /* ⭐ ตัวโน้ตใหญ่ */
-      margin: 20px 0;
-    }
+.progress{
+  text-align:left;
+  margin-bottom:10px;
+  font-weight:bold;
+}
 
-    .choices {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
+.note{
+  text-align:center;
+  font-size:5rem;
+  margin:20px 0;
+}
 
-    button.choice {
-      padding: 16px;
-      font-size: 1.1rem;
-      border: none;
-      border-radius: 14px;
-      background: #eaeaea;
-      cursor: pointer;
-      transition: 0.2s;
-    }
+.choices{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
 
-    button.choice:active {
-      transform: scale(0.96);
-    }
+.choice{
+  padding:16px;
+  font-size:1.1rem;
+  border:none;
+  border-radius:14px;
+  background:#eaeaea;
+  cursor:pointer;
+  transition:.15s;
+}
 
-    .correct {
-      background: #4caf50 !important;
-      color: white;
-    }
+.choice:active{
+  transform:scale(.95);
+}
 
-    .wrong {
-      background: #f44336 !important;
-      color: white;
-    }
+.correct{
+  background:#4caf50 !important;
+  color:white;
+}
 
-    .info {
-      margin-top: 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+.wrong{
+  background:#f44336 !important;
+  color:white;
+}
 
-    .reset {
-      padding: 10px 14px;
-      border-radius: 10px;
-      border: none;
-      background: orange;
-      color: white;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-  </style>
+.info{
+  margin-top:16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.reset{
+  padding:10px 14px;
+  border:none;
+  border-radius:10px;
+  background:orange;
+  color:white;
+  cursor:pointer;
+}
+</style>
 </head>
 
 <body>
-  <div class="app">
-    <h1>🎵 เกมทายโน้ตดนตรี</h1>
+<div class="app">
 
-    <div class="note" id="noteSymbol">♯</div>
+<h1>🎵 เกมทายโน้ตดนตรี</h1>
 
-    <div class="choices">
-      <button class="choice" onclick="checkAnswer('whole', this)">ตัวกลม</button>
-      <button class="choice" onclick="checkAnswer('half', this)">ตัวขาว</button>
-      <button class="choice" onclick="checkAnswer('black', this)">ตัวดำ</button>
-      <button class="choice" onclick="checkAnswer('sharp', this)">ตัวเขบ็ด</button>
-    </div>
+<div class="progress" id="progress">ข้อที่ 1 / 15</div>
 
-    <div class="info">
-      <div>คะแนน: <span id="score">0</span></div>
-      <button class="reset" onclick="resetGame()">เล่นใหม่</button>
-    </div>
-  </div>
+<div class="note" id="noteSymbol">♯</div>
 
-  <script>
-    let score = 0;
+<div class="choices">
+  <button class="choice" onclick="answer('whole',this)">ตัวกลม</button>
+  <button class="choice" onclick="answer('half',this)">ตัวขาว</button>
+  <button class="choice" onclick="answer('black',this)">ตัวดำ</button>
+  <button class="choice" onclick="answer('sharp',this)">ตัวเขบ็ด</button>
+</div>
 
-    const questions = [
-      { symbol: "♪", answer: "sharp" },
-      { symbol: "●", answer: "whole" },
-      { symbol: "𝅗𝅥", answer: "half" },
-      { symbol: "♩", answer: "black" }
-    ];
+<div class="info">
+  <div>คะแนน: <span id="score">0</span></div>
+  <button class="reset" onclick="resetGame()">เล่นใหม่</button>
+</div>
 
-    let current;
+</div>
 
-    function newQuestion() {
-      current = questions[Math.floor(Math.random() * questions.length)];
-      document.getElementById("noteSymbol").textContent = current.symbol;
+<script>
+const TOTAL = 15;
+let score = 0;
+let index = 0;
 
-      document.querySelectorAll(".choice").forEach(btn => {
-        btn.classList.remove("correct", "wrong");
-        btn.disabled = false;
-      });
-    }
+const questions = [
+  {symbol:"♪", answer:"sharp"},
+  {symbol:"●", answer:"whole"},
+  {symbol:"𝅗𝅥", answer:"half"},
+  {symbol:"♩", answer:"black"}
+];
 
-    function checkAnswer(value, button) {
-      document.querySelectorAll(".choice").forEach(b => b.disabled = true);
+// สุ่มชุดคำถาม 15 ข้อ
+let quiz = [];
 
-      if (value === current.answer) {
-        button.classList.add("correct");
-        score++;
-        document.getElementById("score").textContent = score;
-      } else {
-        button.classList.add("wrong");
-      }
+function shuffle(){
+  quiz = [];
+  for(let i=0;i<TOTAL;i++){
+    quiz.push(questions[Math.floor(Math.random()*questions.length)]);
+  }
+}
 
-      setTimeout(newQuestion, 800);
-    }
+function showQuestion(){
+  if(index >= TOTAL){
+    document.getElementById("noteSymbol").textContent = "🎉";
+    document.getElementById("progress").textContent = "จบเกมแล้ว";
+    document.querySelectorAll(".choice").forEach(b=>b.disabled=true);
+    return;
+  }
 
-    function resetGame() {
-      score = 0;
-      document.getElementById("score").textContent = 0;
-      newQuestion();
-    }
+  document.getElementById("noteSymbol").textContent = quiz[index].symbol;
+  document.getElementById("progress").textContent =
+    `ข้อที่ ${index+1} / ${TOTAL}`;
 
-    newQuestion();
-  </script>
+  document.querySelectorAll(".choice").forEach(b=>{
+    b.disabled=false;
+    b.classList.remove("correct","wrong");
+  });
+}
+
+function answer(val,btn){
+  document.querySelectorAll(".choice").forEach(b=>b.disabled=true);
+
+  if(val === quiz[index].answer){
+    btn.classList.add("correct");
+    score++;
+    document.getElementById("score").textContent = score;
+  }else{
+    btn.classList.add("wrong");
+  }
+
+  index++;
+  setTimeout(showQuestion,700);
+}
+
+function resetGame(){
+  score = 0;
+  index = 0;
+  document.getElementById("score").textContent = 0;
+  shuffle();
+  showQuestion();
+}
+
+shuffle();
+showQuestion();
+</script>
+
 </body>
 </html>
-
