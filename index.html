@@ -1,15 +1,20 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-  <meta charset="UTF-8">
-  <title>เกมทายโน้ตดนตรี</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+<h1>🎵 เกมทายโน้ตดนตรี</h1>
 
-  <!-- YOUR GAME HTML HERE -->
+<div id="card">
+  <div id="question">ข้อที่ 1 / 15</div>
 
-  <script src="script.js"></script>
-</body>
-</html>
+  <div id="note">♩</div>
+
+  <div class="buttons">
+    <button class="whole" onclick="checkAnswer('ตัวกลม')">ตัวกลม</button>
+    <button class="half" onclick="checkAnswer('ตัวขาว')">ตัวขาว</button>
+    <button class="quarter" onclick="checkAnswer('ตัวดำ')">ตัวดำ</button>
+    <button class="eighth" onclick="checkAnswer('ตัวเขบ็ต')">ตัวเขบ็ต</button>
+  </div>
+
+  <div id="result"></div>
+  <div id="score">คะแนน: 0</div>
+
+  <!-- ปุ่มเล่นใหม่ -->
+  <button id="restartBtn" onclick="restartGame()">🔁 เล่นใหม่</button>
+</div>
