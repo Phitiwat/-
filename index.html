@@ -3,13 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>เกมทายโน้ตดนตรี</title>
+<title>เกมกลุ่ม ชายสี่</title>
 
 <style>
-*{
-  box-sizing:border-box;
-  font-family:system-ui,sans-serif;
-}
+*{box-sizing:border-box;font-family:system-ui,sans-serif}
 
 body{
   margin:0;
@@ -25,21 +22,20 @@ body{
   padding:20px;
 }
 
-h1{
-  text-align:center;
-  font-size:2rem;
-}
+h1{text-align:center;font-size:2rem}
 
-.progress{
-  text-align:left;
-  margin-bottom:10px;
-  font-weight:bold;
-}
+.progress{font-weight:bold;margin-bottom:10px}
 
 .note{
   text-align:center;
-  font-size:5rem;
+  font-size:6rem;
   margin:20px 0;
+}
+
+.emoji{
+  text-align:center;
+  font-size:3rem;
+  height:3.5rem;
 }
 
 .choices{
@@ -54,23 +50,12 @@ h1{
   border:none;
   border-radius:14px;
   background:#eaeaea;
-  cursor:pointer;
-  transition:.15s;
 }
 
-.choice:active{
-  transform:scale(.95);
-}
+.choice:active{transform:scale(.95)}
 
-.correct{
-  background:#4caf50 !important;
-  color:white;
-}
-
-.wrong{
-  background:#f44336 !important;
-  color:white;
-}
+.correct{background:#4caf50!important;color:white}
+.wrong{background:#f44336!important;color:white}
 
 .info{
   margin-top:16px;
@@ -85,7 +70,6 @@ h1{
   border-radius:10px;
   background:orange;
   color:white;
-  cursor:pointer;
 }
 </style>
 </head>
@@ -93,11 +77,12 @@ h1{
 <body>
 <div class="app">
 
-<h1>🎵 เกมทายโน้ตดนตรี</h1>
+<h1>🎵 เกมกลุ่ม ชายสี่</h1>
 
 <div class="progress" id="progress">ข้อที่ 1 / 15</div>
 
-<div class="note" id="noteSymbol">♯</div>
+<div class="note" id="note">♯</div>
+<div class="emoji" id="emoji"></div>
 
 <div class="choices">
   <button class="choice" onclick="answer('whole',this)">ตัวกลม</button>
@@ -117,35 +102,37 @@ h1{
 const TOTAL = 15;
 let score = 0;
 let index = 0;
+let retry = false;
 
-const questions = [
-  {symbol:"♪", answer:"sharp"},
-  {symbol:"𝅝", answer:"whole"},
+const pool = [
+  {symbol:"●", answer:"whole"},
   {symbol:"𝅗𝅥", answer:"half"},
-  {symbol:"♩", answer:"black"}
+  {symbol:"♩", answer:"black"},
+  {symbol:"♯", answer:"sharp"}
 ];
 
-// สุ่มชุดคำถาม 15 ข้อ
 let quiz = [];
 
-function shuffle(){
+function start(){
   quiz = [];
   for(let i=0;i<TOTAL;i++){
-    quiz.push(questions[Math.floor(Math.random()*questions.length)]);
+    quiz.push(pool[Math.floor(Math.random()*pool.length)]);
   }
+  show();
 }
 
-function showQuestion(){
+function show(){
   if(index >= TOTAL){
-    document.getElementById("noteSymbol").textContent = "🎉";
+    document.getElementById("note").textContent = "🎉";
     document.getElementById("progress").textContent = "จบเกมแล้ว";
     document.querySelectorAll(".choice").forEach(b=>b.disabled=true);
     return;
   }
 
-  document.getElementById("noteSymbol").textContent = quiz[index].symbol;
+  document.getElementById("note").textContent = quiz[index].symbol;
   document.getElementById("progress").textContent =
     `ข้อที่ ${index+1} / ${TOTAL}`;
+  document.getElementById("emoji").textContent = "";
 
   document.querySelectorAll(".choice").forEach(b=>{
     b.disabled=false;
@@ -158,28 +145,35 @@ function answer(val,btn){
 
   if(val === quiz[index].answer){
     btn.classList.add("correct");
+    document.getElementById("emoji").textContent = "🎊";
     score++;
     document.getElementById("score").textContent = score;
+    retry = false;
+    setTimeout(()=>{ index++; show(); },700);
   }else{
     btn.classList.add("wrong");
-  }
+    document.getElementById("emoji").textContent = "😳";
 
-  index++;
-  setTimeout(showQuestion,700);
+    if(!retry){
+      retry = true;
+      setTimeout(show,700);   // ซ้ำคำถาม 1 รอบ
+    }else{
+      retry = false;
+      setTimeout(()=>{ index++; show(); },700);
+    }
+  }
 }
 
 function resetGame(){
   score = 0;
   index = 0;
+  retry = false;
   document.getElementById("score").textContent = 0;
-  shuffle();
-  showQuestion();
+  start();
 }
 
-shuffle();
-showQuestion();
+start();
 </script>
 
 </body>
-</html>
-
+  </html>
