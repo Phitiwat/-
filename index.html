@@ -7,133 +7,56 @@
 
 <style>
 *{box-sizing:border-box;font-family:system-ui,sans-serif}
-
-body{
-  margin:0;
-  min-height:100vh;
-  display:flex;
-  justify-content:center;
-  background:#f6f6f6;
-}
-
-.app{
-  width:100%;
-  max-width:420px;
-  padding:20px;
-}
-
-h1{text-align:center;font-size:2rem}
-
-.progress{font-weight:bold;margin-bottom:10px}
-
-.note{
-  text-align:center;
-  font-size:6rem;
-  margin:20px 0;
-}
-
-.emoji{
-  text-align:center;
-  font-size:3rem;
-  height:3.5rem;
-}
-
-.choices{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
-
-.choice{
-  padding:16px;
-  font-size:1.1rem;
-  border:none;
-  border-radius:14px;
-  background:#eaeaea;
-}
-
-.choice:active{transform:scale(.95)}
-
-.correct{background:#4caf50!important;color:white}
-.wrong{background:#f44336!important;color:white}
-
-.info{
-  margin-top:16px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.reset{
-  padding:10px 14px;
-  border:none;
-  border-radius:10px;
-  background:orange;
-  color:white;
-}
+body{margin:0;min-height:100vh;display:flex;justify-content:center;background:#f6f6f6}
+.app{width:100%;max-width:480px;padding:20px}
+h1{text-align:center}
+.note{text-align:center;font-size:6rem;margin:20px 0}
+.emoji{text-align:center;font-size:3rem;height:3.5rem}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.choice{padding:14px;border:none;border-radius:14px;background:#eaeaea;font-size:1rem}
+.correct{background:#4caf50!important;color:#fff}
+.wrong{background:#f44336!important;color:#fff}
 </style>
 </head>
 
 <body>
 <div class="app">
-
 <h1>🎵 เกมกลุ่ม ชายสี่</h1>
 
-<div class="progress" id="progress">ข้อที่ 1 / 15</div>
-
-<div class="note" id="note">♯</div>
-<div class="emoji" id="emoji"></div>
+<div id="note" class="note">●</div>
+<div id="emoji" class="emoji"></div>
 
 <div class="choices">
-  <button class="choice" onclick="answer('whole',this)">ตัวกลม</button>
-  <button class="choice" onclick="answer('half',this)">ตัวขาว</button>
-  <button class="choice" onclick="answer('black',this)">ตัวดำ</button>
-  <button class="choice" onclick="answer('sharp',this)">ตัวเขบ็ด</button>
-</div>
+  <button class="choice" onclick="answer('whole-rest',this)">𝄻 ตัวหยุดตัวกลม</button>
+  <button class="choice" onclick="answer('half-rest',this)">𝄼 ตัวหยุดตัวขาว</button>
+  <button class="choice" onclick="answer('quarter-rest',this)">𝄽 ตัวหยุดตัวดำ</button>
+  <button class="choice" onclick="answer('sharp-rest',this)">𝄾 ตัวหยุดตัวเขบ็ด</button>
 
-<div class="info">
-  <div>คะแนน: <span id="score">0</span></div>
-  <button class="reset" onclick="resetGame()">เล่นใหม่</button>
+  <button class="choice" onclick="answer('whole',this)">● ตัวกลม</button>
+  <button class="choice" onclick="answer('half',this)">𝅗𝅥 ตัวขาว</button>
+  <button class="choice" onclick="answer('quarter',this)">♩ ตัวดำ</button>
+  <button class="choice" onclick="answer('sharp',this)">♯ ตัวเขบ็ด</button>
 </div>
-
 </div>
 
 <script>
-const TOTAL = 15;
-let score = 0;
-let index = 0;
-let retry = false;
-
-const pool = [
-  {symbol:"●", answer:"whole"},
+const questions = [
+  {symbol:"𝅝", answer:"whole"},
   {symbol:"𝅗𝅥", answer:"half"},
-  {symbol:"♩", answer:"black"},
-  {symbol:"♪", answer:"sharp"}
+  {symbol:"♩", answer:"quarter"},
+  {symbol:"♪", answer:"sharp"},
+  {symbol:"𝄻", answer:"whole-rest"},
+  {symbol:"𝄼", answer:"half-rest"},
+  {symbol:"𝄽", answer:"quarter-rest"},
+  {symbol:"𝄾", answer:"sharp-rest"}
 ];
 
-let quiz = [];
+let current;
 
-function start(){
-  quiz = [];
-  for(let i=0;i<TOTAL;i++){
-    quiz.push(pool[Math.floor(Math.random()*pool.length)]);
-  }
-  show();
-}
-
-function show(){
-  if(index >= TOTAL){
-    document.getElementById("note").textContent = "🎉";
-    document.getElementById("progress").textContent = "จบเกมแล้ว";
-    document.querySelectorAll(".choice").forEach(b=>b.disabled=true);
-    return;
-  }
-
-  document.getElementById("note").textContent = quiz[index].symbol;
-  document.getElementById("progress").textContent =
-    `ข้อที่ ${index+1} / ${TOTAL}`;
+function newQuestion(){
+  current = questions[Math.floor(Math.random()*questions.length)];
+  document.getElementById("note").textContent = current.symbol;
   document.getElementById("emoji").textContent = "";
-
   document.querySelectorAll(".choice").forEach(b=>{
     b.disabled=false;
     b.classList.remove("correct","wrong");
@@ -142,39 +65,18 @@ function show(){
 
 function answer(val,btn){
   document.querySelectorAll(".choice").forEach(b=>b.disabled=true);
-
-  if(val === quiz[index].answer){
+  if(val === current.answer){
     btn.classList.add("correct");
     document.getElementById("emoji").textContent = "🎊";
-    score++;
-    document.getElementById("score").textContent = score;
-    retry = false;
-    setTimeout(()=>{ index++; show(); },700);
+    setTimeout(newQuestion,700);
   }else{
     btn.classList.add("wrong");
     document.getElementById("emoji").textContent = "😳";
-
-    if(!retry){
-      retry = true;
-      setTimeout(show,700);   // ซ้ำคำถาม 1 รอบ
-    }else{
-      retry = false;
-      setTimeout(()=>{ index++; show(); },700);
-    }
+    setTimeout(newQuestion,700);
   }
 }
 
-function resetGame(){
-  score = 0;
-  index = 0;
-  retry = false;
-  document.getElementById("score").textContent = 0;
-  start();
-}
-
-start();
+newQuestion();
 </script>
-
 </body>
-  </html>
-
+</html>
