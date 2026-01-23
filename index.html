@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>เกมกลุ่ม ชายสี่ ป6/5</title>
+<title>เกม กลุ่มชายสี่ ป6/5</title>
 
 <style>
 *{ box-sizing:border-box; }
@@ -14,44 +14,26 @@ body{
   display:flex;
   justify-content:center;
   align-items:center;
+  background:linear-gradient(135deg,#fbc2eb,#a6c1ee);
   font-family:system-ui,sans-serif;
-  background:linear-gradient(135deg,#ff9a9e,#fad0c4,#a6c1ee);
-  background-size:300% 300%;
-  animation:bg 10s infinite;
+  transition:.3s;
 }
-@keyframes bg{
-  0%{background-position:0% 50%}
-  50%{background-position:100% 50%}
-  100%{background-position:0% 50%}
-}
-body.correct{ background:#9fffd0; }
-body.wrong{ background:#ffb3b3; }
+
+body.correct{ background:linear-gradient(135deg,#84fab0,#8fd3f4); }
+body.wrong{ background:linear-gradient(135deg,#ff9a9e,#fad0c4); }
 
 .game{
-  background:#fff;
+  background:white;
   width:100%;
   max-width:420px;
   padding:20px;
   border-radius:20px;
   text-align:center;
-  box-shadow:0 15px 35px rgba(0,0,0,.3);
+  box-shadow:0 10px 30px rgba(0,0,0,.25);
 }
 
-h1{
-  margin:5px 0;
-  font-size:1.4rem;
-}
-
-#score{
-  font-size:1.3rem;
-  font-weight:bold;
-  color:#ff5f9e;
-}
-
-#note{
-  font-size:6rem;
-  margin:15px 0;
-}
+#score{ font-size:1.2rem; font-weight:bold; }
+#note{ font-size:5.5rem; margin:10px 0; }
 
 .buttons{
   display:grid;
@@ -61,198 +43,239 @@ h1{
 
 button{
   padding:14px;
+  font-size:1rem;
   border:none;
   border-radius:14px;
-  font-size:1rem;
   cursor:pointer;
-  background:linear-gradient(135deg,#fdfbfb,#ebedee);
-}
-button:disabled{opacity:.4}
-button:active{transform:scale(.95)}
-
-.control{
-  margin-top:8px;
-  width:100%;
-  font-weight:bold;
 }
 
-.reset{background:#ffd59e}
-.rename{background:#b5d8ff}
-.delete{background:#ffb3c6}
+.action{ margin-top:8px; width:100%; font-weight:bold; }
 
+.reset{ background:#ffd6a5; }
+.rename{ background:#cdb4db; }
+.delete{ background:#ffafcc; }
+.newid{ background:#bde0fe; }
+
+/* emoji */
 #emoji{
   position:fixed;
   inset:0;
   display:flex;
   justify-content:center;
   align-items:center;
-  font-size:12rem;
+  font-size:10rem;
   opacity:0;
   pointer-events:none;
+  transition:.2s;
 }
-#emoji.show{opacity:1}
+#emoji.show{ opacity:1; }
 
-.leaderboard{
-  margin-top:15px;
-  text-align:left;
+/* leaderboard */
+.leaderboard{ margin-top:15px; text-align:left; }
+.leaderboard input{ width:100%; padding:6px; }
+.leaderboard li span{ float:right; color:red; cursor:pointer; }
+
+/* LOGIN POPUP */
+#loginOverlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.7);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:999;
 }
-.leaderboard h2{margin:5px 0}
 
-.search{
+.loginBox{
+  background:white;
+  padding:25px;
+  border-radius:20px;
+  width:90%;
+  max-width:320px;
+  text-align:center;
+}
+
+.loginBox h2{ margin-top:0; }
+
+.loginBox input{
   width:100%;
-  padding:6px;
-  border-radius:8px;
-  border:1px solid #ccc;
+  padding:12px;
+  margin:10px 0;
+  font-size:1rem;
 }
 
-ol{padding-left:20px}
-li{cursor:pointer}
+.loginBox button{
+  width:100%;
+  padding:12px;
+  font-size:1rem;
+  background:linear-gradient(135deg,#84fab0,#8fd3f4);
+  border:none;
+  border-radius:12px;
+}
 </style>
 </head>
 
 <body>
 
-<div class="game">
-  <h1>🎵 เกมกลุ่ม ชายสี่ ป.6/5 อนุบาลชลบุรี</h1>
-  <div id="score">คะแนน: 0</div>
-  <div id="note">♪</div>
-
-  <div class="buttons">
-    <button onclick="answer('whole')"> ตัวกลม</button>
-    <button onclick="answer('half')"> ตัวขาว</button>
-    <button onclick="answer('quarter')"> ตัวดำ</button>
-    <button onclick="answer('eighth')"> ตัวเขบ็ด</button>
-    <button onclick="answer('whole-rest')"> หยุดตัวกลม</button>
-    <button onclick="answer('half-rest')"> หยุดตัวขาว</button>
-    <button onclick="answer('quarter-rest')"> หยุดตัวดำ</button>
-    <button onclick="answer('eighth-rest')"> หยุดตัวเขบ็ด</button>
-  </div>
-
-  <button class="control reset" onclick="resetGame()">🔄 เริ่มใหม่</button>
-  <button class="control rename" onclick="changeName()">✏️ เปลี่ยนชื่อ</button>
-  <button class="control delete" onclick="deleteMyScore()">🗑️ ลบคะแนนตัวเอง</button>
-
-  <div class="leaderboard">
-    <h2>🏆 Leaderboard</h2>
-    <input class="search" placeholder="ค้นหาชื่อ" oninput="renderBoard(this.value)">
-    <ol id="board"></ol>
+<!-- LOGIN -->
+<div id="loginOverlay" style="display:none">
+  <div class="loginBox">
+    <h2>🔐 เข้าสู่เกม</h2>
+    <p>ตั้งชื่อก่อนเล่น</p>
+    <input id="loginName" placeholder="ชื่อ LINE">
+    <button onclick="login()">เริ่มเล่น</button>
   </div>
 </div>
 
-<div id="emoji"></div>
+<div class="game">
+<h1>🎵 เกมกลุ่ม ชายสี่ ป6/5 อนุบาลชลบุรี</h1>
+<div id="score">คะแนน: 0</div>
+<div id="note">♪</div>
+
+<div class="buttons">
+<button onclick="answer('whole')"> ตัวกลม</button>
+<button onclick="answer('half')"> ตัวขาว</button>
+<button onclick="answer('quarter')"> ตัวดำ</button>
+<button onclick="answer('eighth')"> ตัวเขบ็ด</button>
+<button onclick="answer('whole-rest')"> หยุดตัวกลม</button>
+<button onclick="answer('half-rest')"> หยุดตัวขาว</button>
+<button onclick="answer('quarter-rest')"> หยุดตัวดำ</button>
+<button onclick="answer('eighth-rest')"> หยุดตัวเขบ็ด</button>
+</div>
+
+<button class="action reset" onclick="resetGame()">🔄 เริ่มใหม่</button>
+<button class="action rename" onclick="changeName()">✏️ เปลี่ยนชื่อ</button>
+<button class="action delete" onclick="deleteMyScore()">🗑️ ลบคะแนนตัวเอง</button>
+<button class="action newid" onclick="resetPlayerId()">🆔 สร้าง ID ใหม่</button>
+
+<div class="leaderboard">
+<h3>🏆 Leaderboard</h3>
+<input placeholder="ค้นหาชื่อ" oninput="renderBoard(this.value)">
+<ol id="board"></ol>
+</div>
+</div>
+
+<div id="emoji">🤣</div>
 
 <script>
-const correctSound = new Audio("correct.mp3");
-const wrongSound   = new Audio("wrong.mp3");
-
 const pool=[
- {symbol:"𝅝",answer:"whole"},
- {symbol:"𝅗𝅥",answer:"half"},
- {symbol:"♩",answer:"quarter"},
- {symbol:"♪",answer:"eighth"},
- {symbol:"𝄻",answer:"whole-rest"},
- {symbol:"𝄼",answer:"half-rest"},
- {symbol:"𝄽",answer:"quarter-rest"},
- {symbol:"𝄾",answer:"eighth-rest"}
+{symbol:"𝅝",answer:"whole"},
+{symbol:"𝅗𝅥",answer:"half"},
+{symbol:"♩",answer:"quarter"},
+{symbol:"♪",answer:"eighth"},
+{symbol:"𝄻",answer:"whole-rest"},
+{symbol:"𝄼",answer:"half-rest"},
+{symbol:"𝄽",answer:"quarter-rest"},
+{symbol:"𝄾",answer:"eighth-rest"}
 ];
 
-let current, score=0, locked=false;
+let current,score=0,locked=false;
+let playerId=localStorage.getItem("playerId");
+let playerName=localStorage.getItem("playerName");
 
-let player = localStorage.getItem("playerName");
-if(!player){
-  player = prompt("ใส่ชื่อในเกม") || "ไม่ระบุชื่อ";
-  localStorage.setItem("playerName",player);
+/* LOGIN CHECK */
+if(!playerId || !playerName){
+  document.getElementById("loginOverlay").style.display="flex";
+  lockGame(true);
+}
+
+function login(){
+  const name=document.getElementById("loginName").value.trim();
+  if(!name) return alert("กรุณาใส่ชื่อ");
+  playerName=name;
+  playerId=crypto.randomUUID();
+  localStorage.setItem("playerName",name);
+  localStorage.setItem("playerId",playerId);
+  document.getElementById("loginOverlay").style.display="none";
+  lockGame(false);
+  newQuestion();
+}
+
+function lockGame(state){
+  document.querySelectorAll("button").forEach(b=>b.disabled=state);
 }
 
 function newQuestion(){
   locked=false;
   document.body.classList.remove("correct","wrong");
   document.getElementById("emoji").classList.remove("show");
-  current = pool[Math.floor(Math.random()*pool.length)];
+  current=pool[Math.floor(Math.random()*pool.length)];
   document.getElementById("note").textContent=current.symbol;
 }
 
 function answer(v){
   if(locked) return;
   locked=true;
-
   const e=document.getElementById("emoji");
-
   if(v===current.answer){
     score++;
     document.getElementById("score").textContent="คะแนน: "+score;
     document.body.classList.add("correct");
     e.textContent="🎊";
-    correctSound.play();
+    saveScore();
+    e.classList.add("show");
     setTimeout(newQuestion,700);
   }else{
     document.body.classList.add("wrong");
     e.textContent="🤣";
-    wrongSound.play();
+    e.classList.add("show");
     setTimeout(newQuestion,1500);
-  }
-  e.classList.add("show");
-  saveScore();
-}
-
-function resetGame(){
-  score=0;
-  document.getElementById("score").textContent="คะแนน: 0";
-  newQuestion();
-}
-
-function changeName(){
-  const n=prompt("ชื่อใหม่");
-  if(n){
-    player=n;
-    localStorage.setItem("playerName",n);
   }
 }
 
 function saveScore(){
-  let d=JSON.parse(localStorage.getItem("leaderboard")||"[]");
-  d.push({name:player,score});
-  d.sort((a,b)=>b.score-a.score);
-  localStorage.setItem("leaderboard",JSON.stringify(d.slice(0,10)));
+  let data=JSON.parse(localStorage.getItem("leaderboard")||"[]");
+  const i=data.findIndex(p=>p.id===playerId);
+  if(i>-1){ if(score>data[i].score) data[i].score=score; }
+  else data.push({id:playerId,name:playerName,score});
+  data.sort((a,b)=>b.score-a.score);
+  localStorage.setItem("leaderboard",JSON.stringify(data));
   renderBoard();
 }
 
-function renderBoard(f=""){
-  let d=JSON.parse(localStorage.getItem("leaderboard")||"[]");
-  const el=document.getElementById("board");
-  el.innerHTML="";
-  d.forEach((p,i)=>{
-    if(!p.name.includes(f)) return;
+function renderBoard(s=""){
+  const data=JSON.parse(localStorage.getItem("leaderboard")||"[]");
+  const ol=document.getElementById("board");
+  ol.innerHTML="";
+  data.forEach((p,i)=>{
+    if(!p.name.includes(s)) return;
     const li=document.createElement("li");
-    li.textContent=(i===0?"👑 ":"")+p.name+" - "+p.score;
-    li.onclick=()=>{
-      const pass=prompt("ใส่รหัสเพื่อลบ");
-      if(pass==="2013"){
-        d.splice(i,1);
-        localStorage.setItem("leaderboard",JSON.stringify(d));
-        renderBoard();
-      }else if(pass!==null){
-        alert("รหัสไม่ถูก");
-      }
-    };
-    el.appendChild(li);
+    li.innerHTML=`${i===0?"👑 ":""}${p.name} - ${p.score}`;
+    ol.appendChild(li);
   });
 }
 
-function deleteMyScore(){
-  const pass=prompt("ใส่รหัสเพื่อลบคะแนนตัวเอง");
-  if(pass!=="2013") return;
+function resetGame(){ score=0; document.getElementById("score").textContent="คะแนน: 0"; newQuestion(); }
+function changeName(){
+  const n=prompt("ชื่อใหม่",playerName);
+  if(!n) return;
+  playerName=n;
+  localStorage.setItem("playerName",n);
   let d=JSON.parse(localStorage.getItem("leaderboard")||"[]");
-  d=d.filter(p=>p.name!==player);
+  const p=d.find(x=>x.id===playerId);
+  if(p) p.name=n;
+  localStorage.setItem("leaderboard",JSON.stringify(d));
+  renderBoard();
+}
+function deleteMyScore(){
+  if(!confirm("ลบคะแนนตัวเอง?")) return;
+  let d=JSON.parse(localStorage.getItem("leaderboard")||"[]");
+  d=d.filter(p=>p.id!==playerId);
   localStorage.setItem("leaderboard",JSON.stringify(d));
   score=0;
-  document.getElementById("score").textContent="คะแนน: 0";
   renderBoard();
+}
+function resetPlayerId(){
+  if(!confirm("สร้าง ID ใหม่?")) return;
+  deleteMyScore();
+  localStorage.removeItem("playerId");
+  localStorage.removeItem("playerName");
+  location.reload();
 }
 
 renderBoard();
-newQuestion();
+if(playerId && playerName) newQuestion();
 </script>
 
 </body>
-</html>
+  </html>
