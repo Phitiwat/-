@@ -19,8 +19,9 @@ body{
   transition:background 0.3s;
 }
 
+/* เอฟเฟกต์ถูก / ผิด */
 body.correct{
-  background:linear-gradient(135deg,#a8ff78,#78ffd6);
+  background:linear-gradient(135deg,#84fab0,#8fd3f4);
 }
 body.wrong{
   background:linear-gradient(135deg,#ff9a9e,#fad0c4);
@@ -34,7 +35,6 @@ body.wrong{
   border-radius:20px;
   text-align:center;
   box-shadow:0 10px 30px rgba(0,0,0,0.2);
-  position:relative;
 }
 
 h1{
@@ -46,7 +46,6 @@ h1{
   font-size:1.1rem;
   margin-bottom:10px;
   font-weight:bold;
-  color:#6a11cb;
 }
 
 #note{
@@ -54,19 +53,18 @@ h1{
   margin:20px 0;
 }
 
+/* emoji เต็มจอ */
 #emoji{
   position:fixed;
   inset:0;
   display:flex;
   justify-content:center;
   align-items:center;
-  font-size:40vw; /* ใหญ่เต็มจอ */
-  pointer-events:none;
+  font-size:10rem;
   opacity:0;
+  pointer-events:none;
   transition:opacity 0.2s;
-  z-index:10;
 }
-
 #emoji.show{
   opacity:1;
 }
@@ -82,19 +80,9 @@ button{
   font-size:1rem;
   border:none;
   border-radius:14px;
-  color:white;
+  background:#f1f1f1;
   cursor:pointer;
-  font-weight:bold;
 }
-
-button:nth-child(1){background:#ff7675;}
-button:nth-child(2){background:#fdcb6e;}
-button:nth-child(3){background:#74b9ff;}
-button:nth-child(4){background:#55efc4;}
-button:nth-child(5){background:#a29bfe;}
-button:nth-child(6){background:#e17055;}
-button:nth-child(7){background:#0984e3;}
-button:nth-child(8){background:#00b894;}
 
 button:active{
   transform:scale(0.95);
@@ -108,8 +96,6 @@ button:disabled{
 </head>
 
 <body>
-
-<div id="emoji">🤣</div>
 
 <div class="game">
   <h1>🎵 เกมกลุ่ม ชายสี่ ป6/5 อนุบาลชลบุรี</h1>
@@ -130,6 +116,8 @@ button:disabled{
     <button onclick="answer('eighth-rest')"> หยุดตัวเขบ็ด</button>
   </div>
 </div>
+
+<div id="emoji">🤣</div>
 
 <script>
 const correctSound = new Audio("correct.mp3");
@@ -165,8 +153,10 @@ function newQuestion(){
   stopAllSound();
   locked = false;
   disableButtons(false);
-  document.body.className = "";
+
+  document.body.classList.remove("correct","wrong");
   document.getElementById("emoji").classList.remove("show");
+
   current = pool[Math.floor(Math.random()*pool.length)];
   document.getElementById("note").textContent = current.symbol;
 }
@@ -176,28 +166,37 @@ function answer(val){
   locked = true;
   disableButtons(true);
 
+  // ล้างสถานะเก่า (กันบั๊ก)
+  document.body.classList.remove("correct","wrong");
+
   stopAllSound();
+
   const emoji = document.getElementById("emoji");
 
   if(val === current.answer){
     score++;
     document.getElementById("score").textContent = "คะแนน: " + score;
+
     document.body.classList.add("correct");
+    emoji.textContent = "🎊";
+    emoji.classList.add("show");
+
     correctSound.play();
+
+    setTimeout(newQuestion, 700);
   }else{
     document.body.classList.add("wrong");
+    emoji.textContent = "🤣";
+    emoji.classList.add("show");
+
     wrongSound.play();
+
+    setTimeout(newQuestion, 1500);
   }
-
-  emoji.classList.add("show");
-
-  setTimeout(() => {
-    newQuestion();
-  }, val === current.answer ? 700 : 1500);
 }
 
 newQuestion();
 </script>
 
 </body>
-  </html>ตัวกลม
+</html>
