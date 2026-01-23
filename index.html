@@ -30,7 +30,8 @@ body.wrong{background:linear-gradient(135deg,#ff9a9e,#fad0c4)}
   box-shadow:0 10px 30px rgba(0,0,0,.25);
 }
 
-h1{font-size:1.2rem;margin-bottom:5px}
+h1{font-size:1.2rem}
+#player{font-weight:bold;margin-bottom:5px}
 #score{font-size:1.3rem;font-weight:bold}
 
 #note{font-size:5.5rem;margin:20px 0}
@@ -50,24 +51,15 @@ button{
   background:#f1f1f1;
 }
 button:active{transform:scale(.95)}
-button:disabled{opacity:.4}
 
 .control button{
   width:100%;
-  margin-top:10px;
+  margin-top:8px;
   font-weight:bold;
+  background:#ffd6a5;
 }
-.reset{background:#ffd6a5}
-.rename{background:#bde0fe}
-.delete{background:#ffafcc}
 
-.leaderboard{
-  margin-top:15px;
-  text-align:left;
-}
-.leaderboard h2{margin-bottom:5px}
-.leaderboard ol{padding-left:20px;margin:0}
-
+/* emoji เต็มจอ */
 #emoji{
   position:fixed;
   inset:0;
@@ -80,13 +72,47 @@ button:disabled{opacity:.4}
   transition:.2s;
 }
 #emoji.show{opacity:1}
+
+/* login popup */
+#login{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:99;
+}
+.login-box{
+  background:#fff;
+  padding:20px;
+  border-radius:16px;
+  width:90%;
+  max-width:320px;
+  text-align:center;
+}
+.login-box input{
+  width:100%;
+  padding:12px;
+  margin:10px 0;
+  font-size:1rem;
+}
 </style>
 </head>
 
 <body>
 
+<div id="login">
+  <div class="login-box">
+    <h2>👤 สร้างผู้เล่น</h2>
+    <input id="nameInput" placeholder="ใส่ชื่อผู้เล่น">
+    <button onclick="createPlayer()">เริ่มเล่น</button>
+  </div>
+</div>
+
 <div class="game">
   <h1>🎵 เกม กลุ่มชายสี่ ป6/5 อนุบาลชลบุรี</h1>
+  <div id="player"></div>
   <div id="score">คะแนน: 0</div>
 
   <div id="note">♪</div>
@@ -104,22 +130,23 @@ button:disabled{opacity:.4}
   </div>
 
   <div class="control">
-    <button class="reset" onclick="resetGame()">🔄 เริ่มใหม่</button>
-    <button class="rename" onclick="changeName()">✏️ เปลี่ยนชื่อ</button>
-    <button class="delete" onclick="deleteLeaderboard()">🗑️ ลบคะแนน (ใส่รหัส)</button>
-  </div>
-
-  <div class="leaderboard">
-    <h2>🏆 Leaderboard</h2>
-    <ol id="board"></ol>
+    <button onclick="resetGame()">🔄 เริ่มใหม่</button>
+    <button onclick="changeName()">✏️ เปลี่ยนชื่อ</button>
+    <button onclick="newId()">🆕 สร้าง ID ใหม่</button>
   </div>
 </div>
 
 <div id="emoji">🎊</div>
 
 <script>
-const correctSound=new Audio("correct.mp3");
-const wrongSound=new Audio("wrong.mp3");
+const correctSound = new Audio("correct.mp3");
+const wrongSound = new Audio("wrong.mp3");
+
+function stopAllSounds(){
+  [correctSound,wrongSound].forEach(s=>{
+    s.pause(); s.currentTime=0;
+  });
+}
 
 const pool=[
  {symbol:"𝅝",answer:"whole"},
@@ -132,21 +159,43 @@ const pool=[
  {symbol:"𝄾",answer:"eighth-rest"}
 ];
 
-let current,score=0,locked=false;
+let current, score=0, locked=false;
+let playerId = localStorage.getItem("playerId");
+let playerName = localStorage.getItem("playerName");
 
-let playerId=localStorage.getItem("playerId");
-if(!playerId){
-  playerId=crypto.randomUUID();
-  localStorage.setItem("playerId",playerId);
+if(playerId && playerName){
+  document.getElementById("login").style.display="none";
+  document.getElementById("player").textContent="ผู้เล่น: "+playerName;
 }
 
-let playerName=localStorage.getItem("playerName");
-if(!playerName){
-  playerName=prompt("ใส่ชื่อ LINE")||"ไม่ระบุชื่อ";
+function createPlayer(){
+  const name=document.getElementById("nameInput").value.trim();
+  if(!name) return alert("กรุณาใส่ชื่อ");
+  playerId = crypto.randomUUID();
+  playerName = name;
+  localStorage.setItem("playerId",playerId);
   localStorage.setItem("playerName",playerName);
+  document.getElementById("player").textContent="ผู้เล่น: "+playerName;
+  document.getElementById("login").style.display="none";
+  newQuestion();
+}
+
+function changeName(){
+  const n=prompt("เปลี่ยนชื่อ",playerName);
+  if(!n) return;
+  playerName=n;
+  localStorage.setItem("playerName",n);
+  document.getElementById("player").textContent="ผู้เล่น: "+n;
+}
+
+function newId(){
+  if(!confirm("สร้าง ID ใหม่? คะแนนจะถูกรีเซ็ต")) return;
+  localStorage.clear();
+  location.reload();
 }
 
 function newQuestion(){
+  stopAllSounds();
   locked=false;
   document.body.className="";
   document.getElementById("emoji").classList.remove("show");
@@ -155,49 +204,26 @@ function newQuestion(){
 }
 
 function answer(val){
-  if(locked)return;
+  if(locked) return;
   locked=true;
-
+  stopAllSounds();
   const emoji=document.getElementById("emoji");
+
   if(val===current.answer){
     score++;
     document.getElementById("score").textContent="คะแนน: "+score;
     document.body.classList.add("correct");
     emoji.textContent="🎊";
+    emoji.classList.add("show");
     correctSound.play();
-    saveScore();
     setTimeout(newQuestion,700);
   }else{
     document.body.classList.add("wrong");
     emoji.textContent="🤣";
+    emoji.classList.add("show");
     wrongSound.play();
     setTimeout(newQuestion,1500);
   }
-  emoji.classList.add("show");
-}
-
-function saveScore(){
-  let data=JSON.parse(localStorage.getItem("leaderboard")||"[]");
-  const i=data.findIndex(p=>p.id===playerId);
-  if(i>-1){
-    if(score>data[i].score) data[i].score=score;
-  }else{
-    data.push({id:playerId,name:playerName,score});
-  }
-  data.sort((a,b)=>b.score-a.score);
-  localStorage.setItem("leaderboard",JSON.stringify(data));
-  renderBoard();
-}
-
-function renderBoard(){
-  const data=JSON.parse(localStorage.getItem("leaderboard")||"[]");
-  const el=document.getElementById("board");
-  el.innerHTML="";
-  data.forEach((p,i)=>{
-    const li=document.createElement("li");
-    li.textContent=(i===0?"👑 ":"")+`${p.name} - ${p.score}`;
-    el.appendChild(li);
-  });
 }
 
 function resetGame(){
@@ -206,25 +232,8 @@ function resetGame(){
   newQuestion();
 }
 
-function changeName(){
-  const n=prompt("ชื่อใหม่",playerName);
-  if(!n)return;
-  playerName=n;
-  localStorage.setItem("playerName",n);
-  renderBoard();
-}
-
-function deleteLeaderboard(){
-  const code=prompt("ใส่รหัสลบ");
-  if(code!=="2013") return alert("รหัสผิด");
-  if(!confirm("ยืนยันลบ leaderboard ทั้งหมด?"))return;
-  localStorage.removeItem("leaderboard");
-  renderBoard();
-}
-
-renderBoard();
-newQuestion();
+if(playerId && playerName) newQuestion();
 </script>
 
 </body>
-</html>
+  </html>
