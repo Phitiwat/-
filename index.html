@@ -50,6 +50,18 @@ h1{
   height:3.5rem;
 }
 
+/* ❌ Emoji เต็มจอ */
+#emoji.fullscreen{
+  position:fixed;
+  inset:0;
+  background:rgba(255,255,255,0.85);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:8rem;
+  z-index:9999;
+}
+
 .buttons{
   display:grid;
   grid-template-columns:repeat(2,1fr);
@@ -117,6 +129,9 @@ const pool = [
 let current;
 let score = 0;
 let locked = false;
+let timer = null;
+
+const emojiEl = document.getElementById("emoji");
 
 function disableButtons(state){
   document.querySelectorAll("button").forEach(b => b.disabled = state);
@@ -130,37 +145,40 @@ function stopAllSound(){
 }
 
 function newQuestion(){
+  if(timer) clearTimeout(timer);
   stopAllSound();
   locked = false;
   disableButtons(false);
+
+  emojiEl.textContent = "";
+  emojiEl.classList.remove("fullscreen");
+
   current = pool[Math.floor(Math.random()*pool.length)];
   document.getElementById("note").textContent = current.symbol;
-  document.getElementById("emoji").textContent = "";
 }
 
 function answer(val){
   if(locked) return;
   locked = true;
   disableButtons(true);
-
-  let sound;
+  stopAllSound();
 
   if(val === current.answer){
-    document.getElementById("emoji").textContent = "🎊";
+    // ✅ ถูก
+    emojiEl.textContent = "🎊";
     score++;
     document.getElementById("score").textContent = "คะแนน: " + score;
-    sound = correctSound;
+    correctSound.play();
+
+    timer = setTimeout(newQuestion, 700);
   }else{
-    document.getElementById("emoji").textContent = "😳";
-    sound = wrongSound;
+    // ❌ ผิด → 🤣 เต็มจอ
+    emojiEl.textContent = "🤣";
+    emojiEl.classList.add("fullscreen");
+    wrongSound.play();
+
+    timer = setTimeout(newQuestion, 1500);
   }
-
-  stopAllSound();
-  sound.play();
-
-  setTimeout(() => {
-    newQuestion();
-  }, 700);
 }
 
 newQuestion();
