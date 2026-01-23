@@ -6,79 +6,94 @@
 <title>เกมกลุ่ม ชายสี่ ป6/5 อนุบาลชลบุรี</title>
 
 <style>
-*{box-sizing:border-box;font-family:system-ui,sans-serif}
-body{margin:0;min-height:100vh;display:flex;justify-content:center;background:#f6f6f6}
-.app{width:100%;max-width:480px;padding:20px}
-h1{text-align:center}
-.note{text-align:center;font-size:6rem;margin:20px 0}
-.emoji{text-align:center;font-size:3rem;height:3.5rem}
-.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.choice{padding:14px;border:none;border-radius:14px;background:#eaeaea;font-size:1rem}
-.correct{background:#4caf50!important;color:#fff}
-.wrong{background:#f44336!important;color:#fff}
+body{
+  margin:0;
+  padding:20px;
+  background:linear-gradient(135deg,#fbc2eb,#a6c1ee);
+  font-family:system-ui,sans-serif;
+  text-align:center;
+}
+
+h1{
+  color:#222;
+}
+
+#note{
+  font-size:5rem;
+  margin:20px 0;
+}
+
+#emoji{
+  font-size:3rem;
+  height:3.5rem;
+}
+
+button{
+  margin:6px;
+  padding:12px 16px;
+  font-size:1rem;
+  border:none;
+  border-radius:12px;
+  background:white;
+  cursor:pointer;
+}
+
+button:active{
+  transform:scale(0.95);
+}
 </style>
 </head>
 
 <body>
-<div class="app">
-<h1>🎵 เกมกลุ่ม ชายสี่</h1>
 
-<div id="note" class="note">●</div>
-<div id="emoji" class="emoji"></div>
+<h1>🎵 เกมกลุ่ม ชายสี่ ป6/5 อนุบาลชลบุรี</h1>
 
-<div class="choices">
-  <button class="choice" onclick="answer('whole-rest',this)"> ตัวหยุดตัวกลม</button>
-  <button class="choice" onclick="answer('half-rest',this)"> ตัวหยุดตัวขาว</button>
-  <button class="choice" onclick="answer('quarter-rest',this)"> ตัวหยุดตัวดำ</button>
-  <button class="choice" onclick="answer('sharp-rest',this)"> ตัวหยุดตัวเขบ็ด</button>
+<div id="note">●</div>
+<div id="emoji"></div>
 
-  <button class="choice" onclick="answer('whole',this)"> ตัวกลม</button>
-  <button class="choice" onclick="answer('half',this)"> ตัวขาว</button>
-  <button class="choice" onclick="answer('quarter',this)"> ตัวดำ</button>
-  <button class="choice" onclick="answer('sharp',this)"> ตัวเขบ็ด</button>
-</div>
+<div>
+  <button onclick="answer('whole')">● ตัวกลม</button>
+  <button onclick="answer('half')">𝅗𝅥 ตัวขาว</button>
+  <button onclick="answer('quarter')">♩ ตัวดำ</button>
+  <button onclick="answer('sharp')">♯ ตัวเขบ็ด</button>
+  <br><br>
+  <button onclick="answer('whole-rest')">𝄻 ตัวหยุดตัวกลม</button>
+  <button onclick="answer('half-rest')">𝄼 ตัวหยุดตัวขาว</button>
+  <button onclick="answer('quarter-rest')">𝄽 ตัวหยุดตัวดำ</button>
+  <button onclick="answer('sharp-rest')">𝄾 ตัวหยุดตัวเขบ็ด</button>
 </div>
 
 <script>
-const questions = [
-  {symbol:"𝅝", answer:"whole"},
-  {symbol:"𝅗𝅥", answer:"half"},
-  {symbol:"♩", answer:"quarter"},
-  {symbol:"♪", answer:"sharp"},
-  {symbol:"𝄻", answer:"whole-rest"},
-  {symbol:"𝄼", answer:"half-rest"},
-  {symbol:"𝄽", answer:"quarter-rest"},
-  {symbol:"𝄾", answer:"sharp-rest"}
+const pool = [
+  { symbol: "●", answer: "whole" },
+  { symbol: "𝅗𝅥", answer: "half" },
+  { symbol: "♩", answer: "quarter" },
+  { symbol: "♪", answer: "sharp" },
+  { symbol: "𝄻", answer: "whole-rest" },
+  { symbol: "𝄼", answer: "half-rest" },
+  { symbol: "𝄽", answer: "quarter-rest" },
+  { symbol: "𝄾", answer: "sharp-rest" }
 ];
 
 let current;
 
 function newQuestion(){
-  current = questions[Math.floor(Math.random()*questions.length)];
+  current = pool[Math.floor(Math.random()*pool.length)];
   document.getElementById("note").textContent = current.symbol;
   document.getElementById("emoji").textContent = "";
-  document.querySelectorAll(".choice").forEach(b=>{
-    b.disabled=false;
-    b.classList.remove("correct","wrong");
-  });
 }
 
-function answer(val,btn){
-  document.querySelectorAll(".choice").forEach(b=>b.disabled=true);
+function answer(val){
   if(val === current.answer){
-    btn.classList.add("correct");
     document.getElementById("emoji").textContent = "🎊";
-    setTimeout(newQuestion,700);
   }else{
-    btn.classList.add("wrong");
     document.getElementById("emoji").textContent = "😳";
-    setTimeout(newQuestion,700);
   }
+  setTimeout(newQuestion,700);
 }
 
 newQuestion();
 </script>
+
 </body>
 </html>
-
-
