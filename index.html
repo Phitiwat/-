@@ -18,14 +18,8 @@ body{
   font-family:system-ui,sans-serif;
   transition:background 0.3s;
 }
-
-/* เอฟเฟกต์ถูก / ผิด */
-body.correct{
-  background:linear-gradient(135deg,#84fab0,#8fd3f4);
-}
-body.wrong{
-  background:linear-gradient(135deg,#ff9a9e,#fad0c4);
-}
+body.correct{ background:linear-gradient(135deg,#84fab0,#8fd3f4); }
+body.wrong{ background:linear-gradient(135deg,#ff9a9e,#fad0c4); }
 
 .game{
   background:white;
@@ -34,23 +28,31 @@ body.wrong{
   padding:20px;
   border-radius:20px;
   text-align:center;
-  box-shadow:0 10px 30px rgba(0,0,0,0.2);
+  box-shadow:0 10px 30px rgba(0,0,0,0.25);
 }
 
-h1{
-  font-size:1.3rem;
-  margin-bottom:10px;
+#score{ font-size:1.2rem; font-weight:bold; }
+#note{ font-size:5.5rem; margin:15px 0; }
+
+.buttons{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
 }
 
-#score{
-  font-size:1.1rem;
-  margin-bottom:10px;
+button{
+  padding:14px;
+  font-size:1rem;
+  border:none;
+  border-radius:14px;
+  cursor:pointer;
+}
+button:disabled{ opacity:0.4; }
+
+.reset{
+  margin-top:12px;
+  width:100%;
   font-weight:bold;
-}
-
-#note{
-  font-size:5.5rem;
-  margin:20px 0;
 }
 
 /* emoji เต็มจอ */
@@ -65,43 +67,15 @@ h1{
   pointer-events:none;
   transition:opacity 0.2s;
 }
-#emoji.show{
-  opacity:1;
-}
-
-.buttons{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:10px;
-}
-
-button{
-  padding:14px;
-  font-size:1rem;
-  border:none;
-  border-radius:14px;
-  background:#f1f1f1;
-  cursor:pointer;
-}
-
-button:active{
-  transform:scale(0.95);
-}
-
-button:disabled{
-  opacity:0.4;
-  cursor:not-allowed;
-}
+#emoji.show{ opacity:1; }
 </style>
 </head>
 
 <body>
 
 <div class="game">
-  <h1>🎵 เกมกลุ่ม ชายสี่ ป6/5 อนุบาลชลบุรี</h1>
-
+  <h1>🎵 เกมกลุ่ม ชายสี่</h1>
   <div id="score">คะแนน: 0</div>
-
   <div id="note">♪</div>
 
   <div class="buttons">
@@ -115,9 +89,16 @@ button:disabled{
     <button onclick="answer('quarter-rest')"> หยุดตัวดำ</button>
     <button onclick="answer('eighth-rest')"> หยุดตัวเขบ็ด</button>
   </div>
+
+  <button class="reset" onclick="resetGame()">🔄 เริ่มใหม่</button>
+
+  <div class="leaderboard">
+    <h2>🏆 Leaderboard</h2>
+    <ol id="board"></ol>
+  </div>
 </div>
 
-<div id="emoji">🤣</div>
+<div id="emoji"></div>
 
 <script>
 const correctSound = new Audio("correct.mp3");
@@ -138,8 +119,15 @@ let current;
 let score = 0;
 let locked = false;
 
+let player = localStorage.getItem("playerName");
+if(!player){
+  player = prompt("กรุณาใส่ชื่อ LINE") || "ไม่ระบุชื่อ";
+  localStorage.setItem("playerName", player);
+}
+
 function disableButtons(state){
-  document.querySelectorAll("button").forEach(b => b.disabled = state);
+  document.querySelectorAll(".buttons button")
+    .forEach(b => b.disabled = state);
 }
 
 function stopAllSound(){
@@ -155,20 +143,37 @@ function newQuestion(){
   disableButtons(false);
 
   document.body.classList.remove("correct","wrong");
-  document.getElementById("emoji").classList.remove("show");
+  const emoji = document.getElementById("emoji");
+  emoji.classList.remove("show");
+  emoji.textContent = "";
 
   current = pool[Math.floor(Math.random()*pool.length)];
   document.getElementById("note").textContent = current.symbol;
+}
+
+function saveScore(){
+  const data = JSON.parse(localStorage.getItem("leaderboard") || "[]");
+  data.push({ name: player, score });
+  data.sort((a,b)=>b.score-a.score);
+  localStorage.setItem("leaderboard", JSON.stringify(data.slice(0,10)));
+  renderBoard();
+}
+
+function renderBoard(){
+  const board = JSON.parse(localStorage.getItem("leaderboard") || "[]");
+  const el = document.getElementById("board");
+  el.innerHTML = "";
+  board.forEach(p=>{
+    const li = document.createElement("li");
+    li.textContent = `${p.name} - ${p.score}`;
+    el.appendChild(li);
+  });
 }
 
 function answer(val){
   if(locked) return;
   locked = true;
   disableButtons(true);
-
-  // ล้างสถานะเก่า (กันบั๊ก)
-  document.body.classList.remove("correct","wrong");
-
   stopAllSound();
 
   const emoji = document.getElementById("emoji");
@@ -176,25 +181,29 @@ function answer(val){
   if(val === current.answer){
     score++;
     document.getElementById("score").textContent = "คะแนน: " + score;
-
     document.body.classList.add("correct");
     emoji.textContent = "🎊";
     emoji.classList.add("show");
-
     correctSound.play();
-
-    setTimeout(newQuestion, 700);
+    setTimeout(newQuestion,700);
   }else{
     document.body.classList.add("wrong");
     emoji.textContent = "🤣";
     emoji.classList.add("show");
-
     wrongSound.play();
-
-    setTimeout(newQuestion, 1500);
+    setTimeout(newQuestion,1500);
   }
+
+  saveScore();
 }
 
+function resetGame(){
+  score = 0;
+  document.getElementById("score").textContent = "คะแนน: 0";
+  newQuestion();
+}
+
+renderBoard();
 newQuestion();
 </script>
 
