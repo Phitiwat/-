@@ -121,7 +121,7 @@ let locked = false;
 
 let player = localStorage.getItem("playerName");
 if(!player){
-  player = prompt("กรุณาใส่ชื่อ LINE") || "ไม่ระบุชื่อ";
+  player = prompt("กรุณาใส่ชื่อ LINE ที่จะขึ้นในตารางอันดับ🏆") || "ไม่ระบุชื่อ";
   localStorage.setItem("playerName", player);
 }
 
@@ -209,3 +209,4 @@ newQuestion();
 
 </body>
 </html>
+
