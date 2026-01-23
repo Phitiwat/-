@@ -20,10 +20,10 @@ body{
 }
 
 body.correct{
-  background:linear-gradient(135deg,#84fab0,#8fd3f4);
+  background:linear-gradient(135deg,#43e97b,#38f9d7);
 }
 body.wrong{
-  background:linear-gradient(135deg,#ff9a9e,#fad0c4);
+  background:linear-gradient(135deg,#fa709a,#fee140);
 }
 
 .game{
@@ -31,9 +31,9 @@ body.wrong{
   width:100%;
   max-width:420px;
   padding:20px;
-  border-radius:20px;
+  border-radius:22px;
   text-align:center;
-  box-shadow:0 10px 30px rgba(0,0,0,.25);
+  box-shadow:0 15px 35px rgba(0,0,0,.25);
 }
 
 h1{
@@ -42,14 +42,20 @@ h1{
 }
 
 #score{
-  font-size:1.3rem;
+  font-size:1.4rem;
   font-weight:bold;
-  margin-bottom:10px;
+  color:#333;
 }
 
 #note{
-  font-size:5.5rem;
-  margin:20px 0;
+  font-size:6rem;
+  margin:18px 0;
+  animation:pop .4s ease;
+}
+
+@keyframes pop{
+  from{transform:scale(.7);opacity:0}
+  to{transform:scale(1);opacity:1}
 }
 
 .buttons{
@@ -62,20 +68,32 @@ button{
   padding:14px;
   font-size:1rem;
   border:none;
-  border-radius:14px;
-  background:#f1f1f1;
+  border-radius:16px;
   cursor:pointer;
+  font-weight:bold;
+  color:#333;
+  transition:.15s;
 }
 
+/* สีปุ่ม */
+.btn1{background:#ffd6e0}
+.btn2{background:#d0f4de}
+.btn3{background:#cdb4db}
+.btn4{background:#ffe5b4}
+.btn5{background:#bde0fe}
+.btn6{background:#ffc8dd}
+.btn7{background:#caffbf}
+.btn8{background:#fdffb6}
+
 button:active{
-  transform:scale(.95);
+  transform:scale(.93);
 }
 
 .control button{
-  margin-top:12px;
+  margin-top:14px;
   width:100%;
-  font-weight:bold;
   background:linear-gradient(135deg,#ffecd2,#fcb69f);
+  font-size:1.05rem;
 }
 
 /* emoji เต็มจอ */
@@ -85,14 +103,12 @@ button:active{
   display:flex;
   justify-content:center;
   align-items:center;
-  font-size:10rem;
+  font-size:11rem;
   opacity:0;
   pointer-events:none;
   transition:.2s;
 }
-#emoji.show{
-  opacity:1;
-}
+#emoji.show{opacity:1}
 </style>
 </head>
 
@@ -106,15 +122,15 @@ button:active{
   <div id="note">♪</div>
 
   <div class="buttons">
-    <button onclick="answer('whole')">ตัวกลม</button>
-    <button onclick="answer('half')">ตัวขาว</button>
-    <button onclick="answer('quarter')">ตัวดำ</button>
-    <button onclick="answer('eighth')">ตัวเขบ็ด</button>
+    <button class="btn1" onclick="answer('whole')">ตัวกลม</button>
+    <button class="btn2" onclick="answer('half')">ตัวขาว</button>
+    <button class="btn3" onclick="answer('quarter')">ตัวดำ</button>
+    <button class="btn4" onclick="answer('eighth')">ตัวเขบ็ด</button>
 
-    <button onclick="answer('whole-rest')">หยุดตัวกลม</button>
-    <button onclick="answer('half-rest')">หยุดตัวขาว</button>
-    <button onclick="answer('quarter-rest')">หยุดตัวดำ</button>
-    <button onclick="answer('eighth-rest')">หยุดตัวเขบ็ด</button>
+    <button class="btn5" onclick="answer('whole-rest')">หยุดตัวกลม</button>
+    <button class="btn6" onclick="answer('half-rest')">หยุดตัวขาว</button>
+    <button class="btn7" onclick="answer('quarter-rest')">หยุดตัวดำ</button>
+    <button class="btn8" onclick="answer('eighth-rest')">หยุดตัวเขบ็ด</button>
   </div>
 
   <div class="control">
@@ -151,10 +167,11 @@ let score = 0;
 let locked = false;
 
 function newQuestion(){
-  stopAllSounds();               // 🔇 หยุดเสียงทุกครั้ง
+  stopAllSounds();        // 🔇 หยุดเสียงทันที
   locked = false;
   document.body.className = "";
   document.getElementById("emoji").classList.remove("show");
+
   current = pool[Math.floor(Math.random()*pool.length)];
   document.getElementById("note").textContent = current.symbol;
 }
@@ -174,13 +191,13 @@ function answer(val){
     emoji.textContent = "🎊";
     emoji.classList.add("show");
     correctSound.play();
-    setTimeout(newQuestion, 700);
+    setTimeout(newQuestion,700);
   }else{
     document.body.classList.add("wrong");
     emoji.textContent = "🤣";
     emoji.classList.add("show");
     wrongSound.play();
-    setTimeout(newQuestion, 1500);
+    setTimeout(newQuestion,1500);
   }
 }
 
