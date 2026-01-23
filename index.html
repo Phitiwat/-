@@ -6,20 +6,42 @@
 <title>เกมกลุ่ม ชายสี่ ป6/5 อนุบาลชลบุรี</title>
 
 <style>
+*{
+  box-sizing:border-box;
+}
+
 body{
   margin:0;
-  padding:20px;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
   background:linear-gradient(135deg,#fbc2eb,#a6c1ee);
   font-family:system-ui,sans-serif;
+}
+
+.game{
+  background:white;
+  width:100%;
+  max-width:420px;
+  padding:20px;
+  border-radius:20px;
   text-align:center;
+  box-shadow:0 10px 30px rgba(0,0,0,0.2);
 }
 
 h1{
-  color:#222;
+  font-size:1.3rem;
+  margin-bottom:10px;
+}
+
+#score{
+  font-size:1.1rem;
+  margin-bottom:10px;
 }
 
 #note{
-  font-size:5rem;
+  font-size:5.5rem;
   margin:20px 0;
 }
 
@@ -28,68 +50,117 @@ h1{
   height:3.5rem;
 }
 
+.buttons{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+}
+
 button{
-  margin:6px;
-  padding:12px 16px;
+  padding:14px;
   font-size:1rem;
   border:none;
-  border-radius:12px;
-  background:white;
+  border-radius:14px;
+  background:#f1f1f1;
   cursor:pointer;
 }
 
 button:active{
   transform:scale(0.95);
 }
+
+button:disabled{
+  opacity:0.4;
+  cursor:not-allowed;
+}
 </style>
 </head>
 
 <body>
 
-<h1>🎵 เกมกลุ่ม ชายสี่ ป6/5 อนุบาลชลบุรี</h1>
+<div class="game">
+  <h1>🎵 เกมกลุ่ม ชายสี่ ป6/5 อนุบาลชลบุรี</h1>
 
-<div id="note">●</div>
-<div id="emoji"></div>
+  <div id="score">คะแนน: 0</div>
 
-<div>
-  <button onclick="answer('whole')"> ตัวกลม</button>
-  <button onclick="answer('half')"> ตัวขาว</button>
-  <button onclick="answer('quarter')"> ตัวดำ</button>
-  <button onclick="answer('sharp')"> ตัวเขบ็ด</button>
-  <br><br>
-  <button onclick="answer('whole-rest')"> ตัวหยุดตัวกลม</button>
-  <button onclick="answer('half-rest')"> ตัวหยุดตัวขาว</button>
-  <button onclick="answer('quarter-rest')"> ตัวหยุดตัวดำ</button>
-  <button onclick="answer('sharp-rest')"> ตัวหยุดตัวเขบ็ด</button>
+  <div id="note">♪</div>
+  <div id="emoji"></div>
+
+  <div class="buttons">
+    <button onclick="answer('whole')"> ตัวกลม</button>
+    <button onclick="answer('half')"> ตัวขาว</button>
+    <button onclick="answer('quarter')"> ตัวดำ</button>
+    <button onclick="answer('eighth')"> ตัวเขบ็ด</button>
+
+    <button onclick="answer('whole-rest')"> หยุดตัวกลม</button>
+    <button onclick="answer('half-rest')"> หยุดตัวขาว</button>
+    <button onclick="answer('quarter-rest')"> หยุดตัวดำ</button>
+    <button onclick="answer('eighth-rest')"> หยุดตัวเขบ็ด</button>
+  </div>
 </div>
 
 <script>
+const correctSound = new Audio("correct.mp3");
+const wrongSound   = new Audio("wrong.mp3");
+
 const pool = [
-  { symbol: "𝅝", answer: "whole" },
-  { symbol: "𝅗𝅥", answer: "half" },
-  { symbol: "♩", answer: "quarter" },
-  { symbol: "♪", answer: "sharp" },
-  { symbol: "𝄻", answer: "whole-rest" },
-  { symbol: "𝄼", answer: "half-rest" },
-  { symbol: "𝄽", answer: "quarter-rest" },
-  { symbol: "𝄾", answer: "sharp-rest" }
+  { symbol:"𝅝", answer:"whole" },
+  { symbol:"𝅗𝅥", answer:"half" },
+  { symbol:"♩", answer:"quarter" },
+  { symbol:"♪", answer:"eighth" },
+  { symbol:"𝄻", answer:"whole-rest" },
+  { symbol:"𝄼", answer:"half-rest" },
+  { symbol:"𝄽", answer:"quarter-rest" },
+  { symbol:"𝄾", answer:"eighth-rest" }
 ];
 
 let current;
+let score = 0;
+let locked = false;
+
+function disableButtons(state){
+  document.querySelectorAll("button").forEach(b => b.disabled = state);
+}
+
+function stopAllSound(){
+  correctSound.pause();
+  wrongSound.pause();
+  correctSound.currentTime = 0;
+  wrongSound.currentTime = 0;
+}
 
 function newQuestion(){
+  stopAllSound();
+  locked = false;
+  disableButtons(false);
   current = pool[Math.floor(Math.random()*pool.length)];
   document.getElementById("note").textContent = current.symbol;
   document.getElementById("emoji").textContent = "";
 }
 
 function answer(val){
+  if(locked) return;
+  locked = true;
+  disableButtons(true);
+
+  let sound;
+
   if(val === current.answer){
     document.getElementById("emoji").textContent = "🎊";
+    score++;
+    document.getElementById("score").textContent = "คะแนน: " + score;
+    sound = correctSound;
   }else{
     document.getElementById("emoji").textContent = "😳";
+    sound = wrongSound;
   }
-  setTimeout(newQuestion,700);
+
+  stopAllSound();
+  sound.play();
+
+  setTimeout(() => {
+    newQuestion();
+  }, 700);
 }
 
 newQuestion();
@@ -97,5 +168,3 @@ newQuestion();
 
 </body>
 </html>
-
-
